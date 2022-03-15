@@ -246,6 +246,10 @@ def run_isochrones(row,name,base):
             model1.fit(refit=True, n_live_points=1000, evidence_tolerance=0.5, max_iter=150000)
             if len(model1.derived_samples) < 8 or len(model1.derived_samples)<len(bands):
                 return
+    if os.path.isdir('./posteriors/{f}_posteriors'.format(f=name)) == False:
+        os.mkdir('./posteriors/{f}_posteriors'.format(f=name))
+    if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
+        os.mkdir('./plots/{f}_plots'.format(f=name))
     model1.derived_samples.to_csv("./posteriors/{f}_posteriors/{id}_take2.csv".format(f=name,id=int(row['dr3_source_id'].values[0])), index_label='index')
     plot1 = model1.corner_observed()
     plt.savefig("./plots/{f}_plots/{id1}/corner_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].values[0]),id2=int(row['dr3_source_id'].values[0])))
