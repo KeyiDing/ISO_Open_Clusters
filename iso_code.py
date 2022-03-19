@@ -210,9 +210,11 @@ def run_isochrones(row,name,base):
     needs to run the Bayesian statistics.
     """
     #You set the information about possible composition.
-    model1.set_prior(feh=FlatPrior((-2,0)), AV=PowerLawPrior(alpha=-2., bounds=(0.0001,1.4)))
-
-    # model1.set_prior(feh=FlatPrior((-2, 0)))
+    # model1.set_prior(feh=FlatPrior((-2,0)), AV=PowerLawPrior(alpha=-2., bounds=(0.0001,1.4)))
+    #specific for M67 (experimental, subect to change):
+    model1._bounds['distance'] = (800, 900)
+    model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
+    model1._bounds['AV'] = (0.00, 0.40)
 
     """
     you bound your grid to certain distances. The lower and upper limits of
