@@ -63,12 +63,12 @@ def run_isochrones(row,name,base):
     data in the file appended.
     """
     # if GALEX FUV/NUV are available, then always include them
-    if row['FUVmag'].isna().values[0]==False:
+    if row['FUVmag'].isna().values[0]==False and row['e_FUVmag'].isna().values[0]==False:
         count += 1
         bands.append('GALEX_FUV')
         mags_iso['GALEX_FUV'] = (row['FUVmag'].values[0],row['e_FUVmag'].values[0])
 
-    if row['NUVmag'].isna().values[0]==False:
+    if row['NUVmag'].isna().values[0]==False and row['e_NUVmag'].isna().values[0]==False:
         count += 1
         bands.append('GALEX_NUV')
         mags_iso['GALEX_NUV'] = (row['NUVmag'].values[0],row['e_NUVmag'].values[0])
@@ -76,111 +76,111 @@ def run_isochrones(row,name,base):
     # a flag variable that checks if SkyMapper U band exists
     #if only SkyMapper u-band data available, then use SkyMapper
     skymapper_flag = 0
-    if row['u_psf'].isna().values[0]==False:
+    if row['u_psf'].isna().values[0]==False and row['e_u_psf'].isna().values[0]==False:
         skymapper_flag = 1
         bands.append('SkyMapper_u')
         mags_iso['SkyMapper_u'] = (row['u_psf'].values[0], row['e_u_psf'].values[0])
 
     if skymapper_flag == 1:
         count += 1
-        if row['v_psf'].isna().values[0]==False:
+        if row['v_psf'].isna().values[0]==False and row['e_v_psf'].isna().values[0]==False:
             bands.append('SkyMapper_v')
             mags_iso['SkyMapper_v'] = (row['v_psf'].values[0], row['e_v_psf'].values[0])
-        if row['g_psf'].isna().values[0]==False:
+        if row['g_psf'].isna().values[0]==False and row['e_g_psf'].isna().values[0]==False:
             bands.append('SkyMapper_g')
             mags_iso['SkyMapper_g'] = (row['g_psf'].values[0], row['e_g_psf'].values[0])
-        if row['r_psf'].isna().values[0]==False:
+        if row['r_psf'].isna().values[0]==False and row['e_r_psf'].isna().values[0]==False:
             bands.append('SkyMapper_r')
             mags_iso['SkyMapper_r'] = (row['r_psf'].values[0], row['e_r_psf'].values[0])
-        if row['i_psf'].isna().values[0]==False:
+        if row['i_psf'].isna().values[0]==False and row['e_i_psf'].isna().values[0]==False:
             bands.append('SkyMapper_i')
             mags_iso['SkyMapper_i'] = (row['i_psf'].values[0], row['e_i_psf'].values[0])
-        if row['z_psf'].isna().values[0]==False:
+        if row['z_psf'].isna().values[0]==False and row['e_z_psf'].isna().values[0]==False:
             bands.append('SkyMapper_z')
             mags_iso['SkyMapper_z'] = (row['z_psf'].values[0], row['e_z_psf'].values[0])
 
     sdss_flag = 0
     #  if only SDSS u-band data available, then use SDSS
-    if row['psfMag_uSDSS'].isna().values[0]==False:
+    if row['psfMag_uSDSS'].isna().values[0]==False and row['psfMagErr_uSDSS'].isna().values[0]==False:
         sdss_flag = 1
         bands.append('SDSS_u')
         mags_iso['SDSS_u'] = (row['psfMag_uSDSS'].values[0], row['psfMagErr_uSDSS'].values[0])
 
     if sdss_flag == 1:
         count += 1
-        if row['psfMag_gSDSS'].isna().values[0]==False:
+        if row['psfMag_gSDSS'].isna().values[0]==False and row['psfMagErr_gSDSS'].isna().values[0]==False:
             bands.append('SDSS_g')
             mags_iso['SDSS_g'] = (row['psfMag_gSDSS'].values[0], row['psfMagErr_gSDSS'].values[0])
-        if row['psfMag_rSDSS'].isna().values[0]==False:
+        if row['psfMag_rSDSS'].isna().values[0]==False and row['psfMagErr_rSDSS'].isna().values[0]==False:
             bands.append('SDSS_r')
             mags_iso['SDSS_r'] = (row['psfMag_rSDSS'].values[0], row['psfMagErr_rSDSS'].values[0])
-        if row['psfMag_iSDSS'].isna().values[0]==False:
+        if row['psfMag_iSDSS'].isna().values[0]==False and row['psfMagErr_iSDSS'].isna().values[0]==False:
             bands.append('SDSS_i')
             mags_iso['SDSS_i'] = (row['psfMag_iSDSS'].values[0], row['psfMagErr_iSDSS'].values[0])
-        if row['psfMag_zSDSS'].isna().values[0]==False:
+        if row['psfMag_zSDSS'].isna().values[0]==False and row['psfMagErr_zSDSS'].isna().values[0]==False:
             bands.append('SDSS_z')
             mags_iso['SDSS_z'] = (row['psfMag_zSDSS'].values[0], row['psfMagErr_zSDSS'].values[0])
 
     # if neither SkyMapper or SDSS u-band data is available, then use the survey with the most available bands
     if sdss_flag == 0 and skymapper_flag == 0:
-        if row['v_psf'].isna().values[0]==False:
+        if row['v_psf'].isna().values[0]==False and row['e_v_psf'].isna().values[0]==False:
             count += 1
             bands.append('SkyMapper_v')
             mags_iso['SkyMapper_v'] = (row['v_psf'].values[0], row['e_v_psf'].values[0])
-        if row['g_psf'].isna().values[0]==False:
+        if row['g_psf'].isna().values[0]==False and row['e_g_psf'].isna().values[0]==False:
             count += 1
             bands.append('SkyMapper_g')
             mags_iso['SkyMapper_g'] = (row['g_psf'].values[0], row['e_g_psf'].values[0])
-        if row['r_psf'].isna().values[0]==False:
+        if row['r_psf'].isna().values[0]==False and row['e_r_psf'].isna().values[0]==False:
             count += 1
             bands.append('SkyMapper_r')
             mags_iso['SkyMapper_r'] = (row['r_psf'].values[0], row['e_r_psf'].values[0])
-        if row['i_psf'].isna().values[0]==False:
+        if row['i_psf'].isna().values[0]==False and row['e_i_psf'].isna().values[0]==False:
             count += 1
             bands.append('SkyMapper_i')
             mags_iso['SkyMapper_i'] = (row['i_psf'].values[0], row['e_i_psf'].values[0])
-        if row['z_psf'].isna().values[0]==False:
+        if row['z_psf'].isna().values[0]==False and row['e_z_psf'].isna().values[0]==False:
             count += 1
             bands.append('SkyMapper_z')
             mags_iso['SkyMapper_z'] = (row['z_psf'].values[0], row['e_z_psf'].values[0])
 
-        if row['psfMag_gSDSS'].isna().values[0]==False:
+        if row['psfMag_gSDSS'].isna().values[0]==False and row['psfMagErr_gSDSS'].isna().values[0]==False:
             count += 1
             bands.append('SDSS_g')
             mags_iso['SDSS_g'] = (row['psfMag_gSDSS'].values[0], row['psfMagErr_gSDSS'].values[0])
-        if row['psfMag_rSDSS'].isna().values[0]==False:
+        if row['psfMag_rSDSS'].isna().values[0]==False and row['psfMagErr_rSDSS'].isna().values[0]==False:
             count += 1
             bands.append('SDSS_r')
             mags_iso['SDSS_r'] = (row['psfMag_rSDSS'].values[0], row['psfMagErr_rSDSS'].values[0])
-        if row['psfMag_iSDSS'].isna().values[0]==False:
+        if row['psfMag_iSDSS'].isna().values[0]==False and row['psfMagErr_iSDSS'].isna().values[0]==False:
             count += 1
             bands.append('SDSS_i')
             mags_iso['SDSS_i'] = (row['psfMag_iSDSS'].values[0], row['psfMagErr_iSDSS'].values[0])
-        if row['psfMag_zSDSS'].isna().values[0]==False:
+        if row['psfMag_zSDSS'].isna().values[0]==False and row['psfMagErr_zSDSS'].isna().values[0]==False:
             count += 1
             bands.append('SDSS_z')
             mags_iso['SDSS_z'] = (row['psfMag_zSDSS'].values[0], row['psfMagErr_zSDSS'].values[0])
 
-    if row['j_m'].isna().values[0] ==  False:
+    if row['j_m'].isna().values[0] ==  False and row['j_msigcom'].isna().values[0] ==  False:
         count += 1
         bands.append('2MASS_J')
         mags_iso['2MASS_J'] = (row['j_m'].values[0],row['j_msigcom'].values[0])
 
-    if row['h_m'].isna().values[0] ==  False:
+    if row['h_m'].isna().values[0] ==  False and row['h_msigcom'].isna().values[0] ==  False:
         count += 1
         bands.append('2MASS_H')
         mags_iso['2MASS_H'] = (row['h_m'].values[0],row['h_msigcom'].values[0])
 
-    if row['k_m'].isna().values[0] ==  False:
+    if row['k_m'].isna().values[0] ==  False and row['k_msigcom'].isna().values[0] ==  False:
         count += 1
         bands.append('2MASS_Ks')
         mags_iso['2MASS_Ks'] = (row['k_m'].values[0],row['k_msigcom'].values[0])
 
-    if row['w1mpro'].isna().values[0] ==  False:
+    if row['w1mpro'].isna().values[0] ==  False and row['w1sigmpro'].isna().values[0] ==  False:
         count += 1
         bands.append('WISE_W1')
         mags_iso['WISE_W1'] = (row['w1mpro'].values[0],row['w1sigmpro'].values[0])
-    if row['w2mpro'].isna().values[0] ==  False:
+    if row['w2mpro'].isna().values[0] ==  False and row['w2sigmpro'].isna().values[0] ==  False:
         count += 1
         bands.append('WISE_W2')
         mags_iso['WISE_W2'] = (row['w2mpro'].values[0],row['w2sigmpro'].values[0])
@@ -267,41 +267,3 @@ def run_isochrones(row,name,base):
     #Now when it leaves this function all local variables will be deleted!
     #but keep in mind that matplotlib might keep plots open in the memory so we need
     #to close them
-
-
-
-
-def read_isochrones(name):
-    """
-    Open the files with the isochrones results and saves the median values,
-    the percentiles (16th and 84th) for all information of interest.
-    """
-    params = at.read("./isochrones_input/{}_isochrones.csv".format(name),delimiter=",",header_start=0)
-    stars = params['dr3_source_id']
-    folder = './{}_isochrones/'.format(name)
-    f = open("{}_iso_params_2.csv".format(name), "w")
-    f.write("id,teff_16,teff,teff_84,e_teff,logg_16,logg,logg_84,e_logg,feh_16,feh,feh_84,e_feh,age_16,age,age_84,mass_16,mass,mass_84,radius_16,radius,radius_84,distance_16,distance,distance_84,luminosity_16,luminosity,luminosity_84,AV_16,AV,AV_84,nu_max_16,nu_max,nu_max_84,delta_nu_16,delta_nu,delta_nu_84\n")
-    length = len(stars)
-    for s in range(0,1200):
-        try:
-            i=int(stars[s])
-            data = pd.read_csv('./{f}_isochrones/{id}_take2.csv'.format(f=name,id=i))
-            print(i)
-            f.write("%s,%i,%i,%i,%i,%.2f,%.2f,%.2f,%.3f,%.3f,%.3f,%.3f,%.3f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n"\
-              %(i,np.quantile(data['Teff'],[0.16])-np.quantile(data['Teff'],[0.5]),np.quantile(data['Teff'],[0.5]),np.quantile(data['Teff'],[0.84])-np.quantile(data['Teff'],[0.5]),\
-              np.sqrt((np.quantile(data['Teff'],[0.5]) - np.quantile(data['Teff'],[0.16]))**2. + (np.quantile(data['Teff'],[0.5]) - np.quantile(data['Teff'],[0.84]))**2.),\
-              np.quantile(data['logg'],[0.16])-np.quantile(data['logg'],[0.5]),np.quantile(data['logg'],[0.5]),np.quantile(data['logg'],[0.84])-np.quantile(data['logg'],[0.5]),\
-              np.sqrt((np.quantile(data['logg'],[0.5]) - np.quantile(data['logg'],[0.16]))**2. + (np.quantile(data['logg'],[0.5]) - np.quantile(data['logg'],[0.84]))**2.),\
-              np.quantile(data['feh'],[0.16])-np.quantile(data['feh'],[0.5]),np.quantile(data['feh'],[0.5]),np.quantile(data['feh'],[0.84])-np.quantile(data['feh'],[0.5]),\
-              np.sqrt((np.quantile(data['feh'],[0.5]) - np.quantile(data['feh'],[0.16]))**2. + (np.quantile(data['feh'],[0.5]) - np.quantile(data['feh'],[0.84]))**2.),\
-              (10**np.quantile(data['age'],[0.16]))/10**9 - (10**np.quantile(data['age'],[0.5]))/10**9,(10**np.quantile(data['age'],[0.5]))/10**9,(10**np.quantile(data['age'],[0.84]))/10**9 - (10**np.quantile(data['age'],[0.5]))/10**9,\
-              np.quantile(data['mass'],[0.16])-np.quantile(data['mass'],[0.5]),np.quantile(data['mass'],[0.5]),np.quantile(data['mass'],[0.84])-np.quantile(data['mass'],[0.5]),\
-              np.quantile(data['radius'],[0.16])-np.quantile(data['radius'],[0.5]),np.quantile(data['radius'],[0.5]),np.quantile(data['radius'],[0.84])-np.quantile(data['radius'],[0.5]),\
-              np.quantile(data['distance'],[0.16])-np.quantile(data['distance'],[0.5]),np.quantile(data['distance'],[0.5]),np.quantile(data['distance'],[0.84])-np.quantile(data['distance'],[0.5]),\
-              10**np.quantile(data['logL'],[0.16])-10**np.quantile(data['logL'],[0.5]),10**np.quantile(data['logL'],[0.5]),10**np.quantile(data['logL'],[0.84])-10**np.quantile(data['logL'],[0.5]),\
-              np.quantile(data['AV'],[0.16])-np.quantile(data['AV'],[0.5]),np.quantile(data['AV'],[0.5]),np.quantile(data['AV'],[0.84])-np.quantile(data['AV'],[0.5]), \
-              np.quantile(data['nu_max'],[0.16])-np.quantile(data['nu_max'],[0.5]),np.quantile(data['nu_max'],[0.5]),np.quantile(data['nu_max'],[0.84])-np.quantile(data['nu_max'],[0.5]), \
-              np.quantile(data['delta_nu'],[0.16])-np.quantile(data['delta_nu'],[0.5]),np.quantile(data['delta_nu'],[0.5]),np.quantile(data['delta_nu'],[0.84])-np.quantile(data['delta_nu'],[0.5])))
-        except OSError:
-            continue
-    f.close()
