@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#SBATCH --job-name=iso_open_cluster
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=kding5@jhu.edu
+#SBATCH --array=0-5
+#SBATCH --output=slurm_%A_%a.out
+#SBATCH --partition=unlimited
+#SBATCH --mem=16GB
+#SBATCH --cpus-per-task=1
+
+echo "SLURM_JOBID: " $SLURM_JOBID
+echo "SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
+echo "SLURM_ARRAY_JOB_ID: " $SLURM_ARRAY_JOB_ID
+
+conda activate isochrones
+python ./main_files/main{$SLURM_ARRAY_TASK_ID}.py
