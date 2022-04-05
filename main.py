@@ -2,10 +2,11 @@ import time
 import iso_code
 import pandas as pd
 import os.path
+import sys
 
 def main():
     name="NGC2682 "
-    base="chain0"
+    base=str(sys.argv[1])
     #I am reding the input data as a pandas dataframe because it handles large files much better
     #and saves memory. Also, it is faster. I set up the data type for source id to read the entire number as integer
     #and avoid truncating it
@@ -18,7 +19,7 @@ def main():
     record = pd.DataFrame(data={'index': [], 'source_id': [], 'time': []})
     if os.path.isfile("./records/{}.csv".format(base)):
         record = pd.read_csv("./records/{}.csv".format(base))
-    for i in range(0,200):
+    for i in range(int(sys.argv[2]),int(sys.argv[3])):
         start = time.time()
         #The iloc function will get the row we are interested in running and keep the data structure
         iso_code.run_isochrones(data_input.iloc[[i]],name,base)
