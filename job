@@ -4,13 +4,12 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=kding5@jhu.edu
 #SBATCH --array=0-5
-#SBATCH --output=slurm_%A_%a.out
+#SBATCH --output=slurm_%a.out
 #SBATCH --partition=unlimited
 #SBATCH --mem=16GB
-#SBATCH --cpus-per-task=1
 
 echo "SLURM_JOBID: " $SLURM_JOBID
 echo "SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
 echo "SLURM_ARRAY_JOB_ID: " $SLURM_ARRAY_JOB_ID
 
-python main.py "chain$SLURM_ARRAY_JOB_ID" "$($SLURM_ARRAY_JOB_ID*200)" "$(($SLURM_ARRAY_JOB_ID +1)*200)"
+python main.py $SLURM_ARRAY_TASK_ID
