@@ -215,6 +215,7 @@ def run_isochrones(row,name,base):
     model1._bounds['distance'] = (800, 900)
     model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
     model1._bounds['AV'] = (0.00, 0.40)
+    model1.set_prior(AV=FlatPrior((0.08, 0.28)))
 
     """
     you bound your grid to certain distances. The lower and upper limits of
