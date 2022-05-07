@@ -33,7 +33,10 @@ def run_isochrones(row,name,base):
     only one row in my data!)
     example:
     """
-    params_iso = {'parallax':(row['parallax'].values[0], row['parallax_error'].values[0])}
+    # change parallax and extinction to "mean" of the cluster
+    # also reject stars with ruwe > 1.4
+    extinctionV = 0.13
+    params_iso = {'parallax':(1.1865, 0.0118),'AV': (extinctionV, 0.10*extinctionV)}
 
     """
     Please change the remaining of the code accoring to your choice. Memory wise
@@ -212,10 +215,13 @@ def run_isochrones(row,name,base):
     #You set the information about possible composition.
     # model1.set_prior(feh=FlatPrior((-2,0)), AV=PowerLawPrior(alpha=-2., bounds=(0.0001,1.4)))
     #specific for M67 (experimental, subect to change):
-    model1._bounds['distance'] = (800, 900)
+    LowerExtinction = np.max([0, extinctionV - 3 * 0.10 * extinctionV])
+    UpperExtinction = extinctionV + 3 * 0.10 * extinctionV
+    model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
+    model1._bounds['AV'] = (LowerExtinction, UpperExtinction)
+    model1._bounds['distance'] = (813, 873)
     model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
-    model1._bounds['AV'] = (0.00, 0.40)
-    model1.set_prior(AV=FlatPrior((0.08, 0.28)))
+    model1._bounds['mass'] = (0.50, 1.50)
 
     """
     you bound your grid to certain distances. The lower and upper limits of
@@ -238,17 +244,24 @@ def run_isochrones(row,name,base):
     #Runs and saves the results.
     if os.path.isdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].values[0]))) == False:
         os.mkdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].values[0])))
-    model1.fit(refit=True,n_live_points=1000,evidence_tolerance=0.5,max_iter=75000,basename=base)
+    model1.fit(refit=True,n_live_points=1000,evidence_tolerance=0.5,max_iter=100000,basename=base)
     if len(model1.derived_samples)<8 or len(model1.derived_samples)<len(bands):
-        model1 = SingleStarModel(mist, **params_iso, **mags_iso)
-        model1.set_prior(feh=FlatPrior((-2, 0)), AV=PowerLawPrior(alpha=-2., bounds=(0.0001, 1.0)))
-        model1.fit(refit=True, n_live_points=1000, evidence_tolerance=0.5, max_iter=150000)
-        if len(model1.derived_samples)<8 or len(model1.derived_samples)<len(bands):
-            model1.fit(refit=True, n_live_points=1000, evidence_tolerance=0.5, max_iter=225000)
-            model1.set_prior(feh=FlatPrior((-2, 0)), AV=PowerLawPrior(alpha=-2., bounds=(0.0001, 1.0)))
-            model1.fit(refit=True, n_live_points=1000, evidence_tolerance=0.5, max_iter=150000)
-            if len(model1.derived_samples) < 8 or len(model1.derived_samples)<len(bands):
-                return
+        return
+        # model1 = SingleStarModel(mist, **params_iso, **mags_iso)
+        # model1._bounds['distance'] = (800, 900)
+        # model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
+        # model1._bounds['AV'] = (0.00, 0.40)
+        # model1.set_prior(AV=FlatPrior((0.08, 0.28)))
+        # model1.fit(refit=True, n_live_points=1000, evidence_tolerance=0.5, max_iter=150000,basename=base)
+        # if len(model1.derived_samples)<8 or len(model1.derived_samples)<len(bands):
+        #     model1 = SingleStarModel(mist, **params_iso, **mags_iso)
+        #     model1._bounds['distance'] = (800, 900)
+        #     model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
+        #     model1._bounds['AV'] = (0.00, 0.40)
+        #     model1.set_prior(AV=FlatPrior((0.08, 0.28)))
+        #     model1.fit(refit=True, n_live_points=1000, evidence_tolerance=0.5, max_iter=225000,basename=base)
+        #     if len(model1.derived_samples) < 8 or len(model1.derived_samples)<len(bands):
+        #         return
     if os.path.isdir('./posteriors/{f}_posteriors'.format(f=name)) == False:
         os.mkdir('./posteriors/{f}_posteriors'.format(f=name))
     if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
