@@ -15,14 +15,15 @@ def main():
     #Although standard pratice is to vectorize usage, in our case we do need to use a for loop.
     #Just a for loop to run it for all the stars in my file list
     len = data_input.shape[0]
-    begin=[0,200,400,600,800]
-    final=[200,400,600,800,len]
-    ind = int(sys.argv[1])
-    base = "chain{}".format(ind)
+    # begin=[0,200,400,600,800]
+    # final=[200,400,600,800,len]
+    # ind = int(sys.argv[1])
+    # base = "chain{}".format(ind)
+    base = "chain0"
     record = pd.DataFrame(data={'index': [], 'source_id': [], 'time': []})
     if os.path.isfile("./records/{}.csv".format(base)):
         record = pd.read_csv("./records/{}.csv".format(base))
-    for i in range(begin[ind],final[ind]):
+    for i in range(0,len):
         start = time.time()
         #The iloc function will get the row we are interested in running and keep the data structure
         iso_code.run_isochrones(data_input.iloc[[i]],name,base)
