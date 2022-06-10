@@ -50,8 +50,8 @@ def run_isochrones(i,row,name,base):
     """
     # change parallax and extinction to "mean" of the cluster
     # also reject stars with ruwe > 1.4
-    extinctionV = 0.04953502539529365
-    params_iso = {'parallax':(5.718, 0.005),'AV': (extinctionV, 0.10*extinctionV)}
+    extinctionV = 0.115833
+    params_iso = {'parallax':(5.718, 0.005)}
 
     """
     Please change the remaining of the code accoring to your choice. Memory wise
@@ -240,16 +240,18 @@ def run_isochrones(i,row,name,base):
     #You set the information about possible composition.
     # model1.set_prior(feh=FlatPrior((-2,0)), AV=PowerLawPrior(alpha=-2., bounds=(0.0001,1.4)))
     #specific for M67 (experimental, subect to change):
-    LowerExtinction = np.max([0, extinctionV - 3 * 0.10 * extinctionV])
-    UpperExtinction = extinctionV + 3 * 0.10 * extinctionV
-    model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
-    model1._bounds['AV'] = (LowerExtinction, UpperExtinction)
-    MeanDistance = 1000 / params_iso['parallax'][0]
-    DistanceError = params_iso['parallax'][1] * MeanDistance
-    LowDistance = MeanDistance - 3 * DistanceError
-    HighDistance = MeanDistance + 3 * DistanceError
-    model1._bounds['distance'] = (LowDistance, HighDistance)
-    model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
+
+    # LowerExtinction = np.max([0, extinctionV - 3 * 0.10 * extinctionV])
+    # UpperExtinction = extinctionV + 3 * 0.10 * extinctionV
+    # model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
+    model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
+    model1._bounds['AV'] = (0, 2*extinctionV)
+    # MeanDistance = 1000 / params_iso['parallax'][0]
+    # DistanceError = params_iso['parallax'][1] * MeanDistance
+    # LowDistance = MeanDistance - 3 * DistanceError
+    # HighDistance = MeanDistance + 3 * DistanceError
+    # model1._bounds['distance'] = (LowDistance, HighDistance)
+    # model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
 
     """
     you bound your grid to certain distances. The lower and upper limits of
@@ -270,6 +272,9 @@ def run_isochrones(i,row,name,base):
     #model1._bounds['AV'] = (0,.3) #
     #model1._bounds['feh'] = (params['feh'][idx].iloc[0] - params['err_feh'][idx].iloc[0], params['feh'][idx].iloc[0] + params['err_feh'][idx].iloc[0])
     #Runs and saves the results.
+    if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
+        os.mkdir('./plots/{f}_plots'.format(f=name))
+
     if os.path.isdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0]))) == False:
         os.mkdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0])))
     model1.fit(refit=True,n_live_points=1000,evidence_tolerance=0.5,max_iter=100000,basename=base)
@@ -278,8 +283,6 @@ def run_isochrones(i,row,name,base):
 
     if os.path.isdir('./posteriors/{f}_posteriors'.format(f=name)) == False:
         os.mkdir('./posteriors/{f}_posteriors'.format(f=name))
-    if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
-        os.mkdir('./plots/{f}_plots'.format(f=name))
     model1.derived_samples.to_csv("./posteriors/{f}_posteriors/{id}_take2.csv".format(f=name,id=int(row['dr3_source_id'].iloc[0])), index_label='index')
     plot1 = model1.corner_observed()
     plt.savefig("./plots/{f}_plots/{id1}/corner_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
