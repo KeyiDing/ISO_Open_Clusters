@@ -17,5 +17,5 @@ process named by the base_name, and records the loop index, dr3_source_id, and r
 
 ## Note on Multiprocessing
  - Since the code does not require communication between processes, distributed memory is used to run the code on Rockfish, with each process having 16 GB of memory. Based on our past experiments, Isochrones usually takes less than 13 GB of memory, but feel free to increase it if needed.
- - In the job submission file, the number of CPU cores per node is specified through "ntasks-per-node", therefore it's essential to make sure that the number of processes in the Multiprocessing pool is less or equal to "ntasks-per-node".
+ - In the job submission file, the number of CPU cores per node is specified through "ntasks-per-node", therefore it's essential to make sure that the number of processes in the Multiprocessing pool is less or equal to "ntasks-per-node". The maximum number of processes per node is 48.
  - If one of the process has an issue, the entire pool of processes would be stopped. In this case, manually specify the starting and ending point of the running loop for each process, and resubmit the job.
