@@ -1,7 +1,7 @@
-## ISO_Open_Clusters
+# ISO_Open_Clusters
 Repo for fitting stellar parameters of stars in open clusters using isochrones analysis
 
-# Files and Directories Structure:
+## Files and Directories Structure:
  - iso_input: photometric data for open clusters (in CSV format)
  - main.py & iso_code.py: Python script for running Isochrones
  - plots: Directory to save Isochrones analysis plots, the plots are organized in the format "cluster_name/Gaia_edr3_source_id"
