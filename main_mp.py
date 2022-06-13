@@ -11,7 +11,7 @@ if __name__ == '__main__':
     #input photometry data
     data_input = pd.read_csv("iso_input/Blanco1_nonbinary.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
     #specify the number of processes to run Isochrones in parallel, change it based on your need
-    nprocess=1
+    nprocess=10
 
     #clean up records folder before each new run
     filelist = [f for f in os.listdir("records") if f.endswith(".csv")]
