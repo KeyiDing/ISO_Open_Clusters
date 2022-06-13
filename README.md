@@ -5,6 +5,7 @@ Repo for fitting stellar parameters of stars in open clusters using [Isochrones]
  - iso_input: photometric data for open clusters (in CSV format)
  - main.py & iso_code.py: Python script for running Isochrones
  - main_mp.py: run isochrones through multiprocessing
+ - job: SLURM job submission file
  - plots: Directory to save Isochrones analysis plots, the plots are organized in the format "cluster_name/Gaia_edr3_source_id"
  - posteriors: Directory to save Isochrones posteriors CSV data, organized in the format "cluster_name/Gaia_edr3_source_id_take2.csv"
  - records: a file for keeping records of Isochrones in case the job fails at some point. In the records, a CSV file is created for each
