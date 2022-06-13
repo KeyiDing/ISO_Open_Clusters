@@ -8,8 +8,9 @@ Repo for fitting stellar parameters of stars in open clusters using [Isochrones]
  - job: SLURM job submission file
  - plots: Directory to save Isochrones analysis plots, the plots are organized in the format "cluster_name/Gaia_edr3_source_id"
  - posteriors: Directory to save Isochrones posteriors CSV data, organized in the format "cluster_name/Gaia_edr3_source_id_take2.csv"
+ - nearby_cluster_av.nb: Mathematica file for numerically computing the extinctions of nearby clusters
  - records: a file for keeping records of Isochrones in case the job fails at some point. In the records, a CSV file is created for each
-process named by the base_name, and records the loop index, dr3_source_id, and running time of that particular star. If the job for that process failed, start a new job by running Isochrones starting from the end of the index column.
+process named by the base_name, and records the loop index, dr3_source_id, and running time of that particular star. If the job for that process failed, start a new job by running Isochrones starting from the end of the index column
 
 ## Usage
 1. In main_mp.py, change the input photometry file path, name of the open cluster, and the number of processes based on input.
