@@ -18,7 +18,7 @@ def main():
 
     for i in range(209,len):
         #The iloc function will get the row we are interested in running and keep the data structure
-        iso_code.run_isochrones(i,data_input.iloc[[i]],name,base)
+        iso_code.run_isochrones(data_input.iloc[[i]],name,base)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
