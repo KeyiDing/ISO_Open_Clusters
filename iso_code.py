@@ -10,6 +10,24 @@ import os
 import time
 import sys
 
+def iso_process(tot,df,ind,name,base):
+    #evenly divide the whole input photometry dataframe into n sub-dataframes
+    start = int(ind*(len(df)/tot))
+    end = int((ind+1)*(len(df)/tot))
+
+    #create a "record" dataframe to record running time for each process
+    #in each entry of the record dataframe contains the index of a star in the input photometry file, the source id, and the isochrones running time for that star
+    record = pd.DataFrame(data={'index': [], 'source_id': [], 'time': []})
+
+    #run isochrones and record corrosponding info
+    for i in range(start,end):
+        start_time = time.time()
+        run_isochrones(df.iloc[[i]],name,base)
+        end_time = time.time()
+        print(i)
+        record.loc[record.shape[0]] = [str(i), int(row['dr3_source_id'].iloc[0]), end_time - start_time]
+        record.to_csv("./records/{}.csv".format(base), index=False)
+
 
 # row: the phtometry of current star we are working on
 # name: name of the open cluster
