@@ -20,8 +20,8 @@ def run_isochrones(row,name,base):
     #the first set of data are the known physical parameters of the star
     #in our code, we use the mean parallax of the open cluster as the parallax of each star
     #change the value of extinctionV and parallax based on the open clusters
-    extinctionV = 0.115833
-    params_iso = {'parallax':(5.718, 0.005)}
+    extinctionV = 0.174525
+    params_iso = {'parallax':(4.216, 0.003)}
 
     # The second set of data are the actual stellar magnitudes (or brightness) in
     # each pass band. This is done in two ways. First you tell isochrones which
