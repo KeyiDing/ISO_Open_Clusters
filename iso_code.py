@@ -3,9 +3,11 @@ import pandas as pd
 from isochrones.mist import MIST_Isochrone
 from isochrones.mist.bc import MISTBolometricCorrectionGrid
 from isochrones import get_ichrone, SingleStarModel
-from isochrones.priors import FlatPrior, PowerLawPrior
+from isochrones.priors import FlatPrior, PowerLawPrior,GaussianPrior
 import matplotlib.pyplot as plt
 from astropy.io import ascii as at
+from astropy.coordinates import SkyCoord
+from astropy import units as u
 import os
 import time
 import sys
@@ -14,7 +16,6 @@ def iso_process(tot,df,ind,name,base):
     #evenly divide the whole input photometry dataframe into n sub-dataframes
     start = int(ind*(len(df)/tot))
     end = int((ind+1)*(len(df)/tot))
-    print(end)
 
     #create a "record" dataframe to record running time for each process
     #in each entry of the record dataframe contains the index of a star in the input photometry file, the source id, and the isochrones running time for that star
@@ -38,8 +39,15 @@ def run_isochrones(row,name,base):
     #the first set of data are the known physical parameters of the star
     #in our code, we use the mean parallax of the open cluster as the parallax of each star
     #change the value of extinctionV and parallax based on the open clusters
-    extinctionV = 0.174525
-    params_iso = {'parallax':(4.216, 0.003)}
+    
+    # get Celestial Coordinates
+    r=row["ra2000"].iloc[0]
+    d=row["dec2000"].iloc[0]
+    plx=row["parallax"].iloc[0]
+    c_icrs = SkyCoord(ra=r * u.degree, dec=d * u.degree, frame='icrs')
+    # convert coordinates into galactic, and calculate extinction
+    extinctionV = 0.7*(1-np.exp(-(1/plx)*np.sin(c_icrs.galactic.b)/0.125))*0.125/np.sin(c_icrs.galactic.b)
+    params_iso = {'parallax':(row["parallax"].iloc[0], row["parallax_error"].iloc[0])}
 
     # The second set of data are the actual stellar magnitudes (or brightness) in
     # each pass band. This is done in two ways. First you tell isochrones which
@@ -176,6 +184,28 @@ def run_isochrones(row,name,base):
         bands.append('WISE_W2')
         mags_iso['WISE_W2'] = (row['w2mpro'].iloc[0],row['w2sigmpro'].iloc[0])
 
+    # always use Pan-Starrs if available
+    if row['gMeanPSFMag'].isna().iloc[0] == False and row['gMeanPSFMagErr'].isna().iloc[0] == False:
+        count += 1
+        bands.append("PS_g")
+        mags_iso["PS_g"] = (row["gMeanPSFMag"].iloc[0],row["gMeanPSFMagErr"].iloc[0])
+    if row['rMeanPSFMag'].isna().iloc[0] == False and row['rMeanPSFMagErr'].isna().iloc[0] == False:
+        count += 1
+        bands.append("PS_r")
+        mags_iso["PS_r"] = (row["rMeanPSFMag"].iloc[0],row["rMeanPSFMagErr"].iloc[0])
+    if row['iMeanPSFMag'].isna().iloc[0] == False and row['iMeanPSFMagErr'].isna().iloc[0] == False:
+        count += 1
+        bands.append("PS_i")
+        mags_iso["PS_i"] = (row["iMeanPSFMag"].iloc[0],row["iMeanPSFMagErr"].iloc[0])
+    if row['zMeanPSFMag'].isna().iloc[0] == False and row['zMeanPSFMagErr'].isna().iloc[0] == False:
+        count += 1
+        bands.append("PS_z")
+        mags_iso["PS_z"] = (row["zMeanPSFMag"].iloc[0],row["zMeanPSFMagErr"].iloc[0])
+    if row['yMeanPSFMag'].isna().iloc[0] == False and row['yMeanPSFMagErr'].isna().iloc[0] == False:
+        count += 1
+        bands.append("PS_y")
+        mags_iso["PS_y"] = (row["yMeanPSFMag"].iloc[0],row["yMeanPSFMagErr"].iloc[0])
+
     # if nothing other than Gaia DR2 G-band data are available by this step,
     # then add Gaia DR2 G_BP and G_RP data with appropriate uncertainties
     if count == 0:
@@ -212,7 +242,8 @@ def run_isochrones(row,name,base):
     # LowerExtinction = np.max([0, extinctionV - 3 * 0.10 * extinctionV])
     # UpperExtinction = extinctionV + 3 * 0.10 * extinctionV
     # model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
-    model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
+    # model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
+    model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
     model1._bounds['AV'] = (0, 2*extinctionV)
     # MeanDistance = 1000 / params_iso['parallax'][0]
     # DistanceError = params_iso['parallax'][1] * MeanDistance
