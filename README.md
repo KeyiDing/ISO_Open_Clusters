@@ -5,10 +5,12 @@ Repo for fitting stellar parameters of stars in open clusters using [Isochrones]
  - iso_input: photometric data for open clusters (in CSV format)
  - main.py & iso_code.py: Python script for running Isochrones
  - main_mp.py: run isochrones through multiprocessing
+ - job: SLURM job submission file
  - plots: Directory to save Isochrones analysis plots, the plots are organized in the format "cluster_name/Gaia_edr3_source_id"
  - posteriors: Directory to save Isochrones posteriors CSV data, organized in the format "cluster_name/Gaia_edr3_source_id_take2.csv"
+ - nearby_cluster_av.nb: Mathematica file for numerically computing the extinctions of nearby clusters
  - records: a file for keeping records of Isochrones in case the job fails at some point. In the records, a CSV file is created for each
-process named by the base_name, and records the loop index, dr3_source_id, and running time of that particular star. If the job for that process failed, start a new job by running Isochrones starting from the end of the index column.
+process named by the base_name, and records the loop index, dr3_source_id, and running time of that particular star. If the job for that process failed, start a new job by running Isochrones starting from the end of the index column
 
 ## Usage
 1. In main_mp.py, change the input photometry file path, name of the open cluster, and the number of processes based on input.
@@ -18,4 +20,4 @@ process named by the base_name, and records the loop index, dr3_source_id, and r
 ## Note on Multiprocessing
  - Since the code does not require communication between processes, distributed memory is used to run the code on Rockfish, with each process having 16 GB of memory. Based on our past experiments, Isochrones usually takes less than 13 GB of memory, but feel free to increase it if needed.
  - In the job submission file, the number of CPU cores per node is specified through "ntasks-per-node", therefore it's essential to make sure that the number of processes in the Multiprocessing pool is less or equal to "ntasks-per-node". Theoretically the maximum number of processes per node is 48, but based on my experiment, a multiprocessing pool with approximately 40 processes will lead to IO mutex lock conflicts. I'm still investigating the potential cause.
- - If one of the process has an issue, the entire pool of processes would be stopped. In this case, manually specify the starting and ending point of the running loop for each process, and resubmit the job.
+ - If one of the process has an issue, the entire pool of processes will be stopped. In this case, manually specify the starting and ending point of the running loop for each process, and resubmit the job.
