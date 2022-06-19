@@ -20,7 +20,6 @@ def iso_process(tot,df,ind,name,base):
     #create a "record" dataframe to record running time for each process
     #in each entry of the record dataframe contains the index of a star in the input photometry file, the source id, and the isochrones running time for that star
     record = pd.DataFrame(data={'index': [], 'source_id': [], 'time': []})
-
     #run isochrones and record corrosponding info
     for i in range(start,end):
         start_time = time.time()

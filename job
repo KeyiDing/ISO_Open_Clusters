@@ -1,12 +1,12 @@
 #!/bin/bash -l
 
-#SBATCH --job-name=iso_Blanco1
-#SBATCH --output=iso_Blanco1.out
+#SBATCH --job-name=iso_alphaPer_flat
+#SBATCH --output=iso_alphaPer_flat.out
 #SBATCH --partition=defq
 #SBATCH --time 03-00:00:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=12
-#SBATCH --mem-per-cpu=16GB
+#SBATCH --ntasks-per-node=10
+#SBATCH --mem-per-cpu=20GB
 
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=kding5@jhu.edu

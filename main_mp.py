@@ -7,11 +7,11 @@ import time
 
 if __name__ == '__main__':
     #name of the open cluster
-    name = "Blanco1"
+    name = "alphaPer_flat"
     #input photometry data
-    data_input = pd.read_csv("iso_input/Blanco1_nonbinary.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
+    data_input = pd.read_csv("iso_input/alphaPer_nonbinary.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
     #specify the number of processes to run Isochrones in parallel, change it based on your need
-    nprocess=10
+    nprocess=5
 
     #clean up records folder before each new run
     filelist = [f for f in os.listdir("records") if f.endswith(".csv")]
