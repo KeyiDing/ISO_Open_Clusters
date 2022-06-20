@@ -2,23 +2,29 @@ import iso_code
 import pandas as pd
 import os.path
 import sys
+import time
 
 def main():
-    name="alphaPer"
-    #I am reding the input data as a pandas dataframe because it handles large files much better
-    #and saves memory. Also, it is faster. I set up the data type for source id to read the entire number as integer
-    #and avoid truncating it
-    data_input = pd.read_csv("iso_input/alphaPer_nonbinary.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
-    # data_input = data_input[(data_input['Cluster'] == 'NGC2682 ')]
-    name = name.strip()
-    #Although standard pratice is to vectorize usage, in our case we do need to use a for loop.
-    #Just a for loop to run it for all the stars in my file list
-    len = data_input.shape[0]
-    base = "chain1"
+    #name of the open cluster
+    name = "Praesepe"
+    #input photometry data
+    data_input = pd.read_csv("iso_input/Praesepe_nonbinary.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
+    #specify the number of processes to run Isochrones in parallel, change it based on your need
+    nprocess=20
 
-    for i in range(209,len):
-        #The iloc function will get the row we are interested in running and keep the data structure
-        iso_code.run_isochrones(data_input.iloc[[i]],name,base)
+    #clean up records folder before each new run
+    filelist = [f for f in os.listdir("records") if f.endswith(".csv")]
+    for f in filelist:
+        os.remove(os.path.join("records", f))
+
+    #read the index of current thread
+    ind = int(sys.argv[1])
+    base = "chain{}".format(ind)
+
+    #run isochrones
+    iso_code.iso_process(nprocess,data_input,ind,name,base)
+
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
