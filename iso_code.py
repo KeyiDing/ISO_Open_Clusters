@@ -237,19 +237,23 @@ def run_isochrones(row,name,base):
 
 
     # specify Prior distribution and bound to do Bayesian Statistics
-
-    # LowerExtinction = np.max([0, extinctionV - 3 * 0.10 * extinctionV])
-    # UpperExtinction = extinctionV + 3 * 0.10 * extinctionV
-    # model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
-    # model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
+    
+    # Nearby clusters
+    model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
     model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
-    model1._bounds['AV'] = (0, 2*extinctionV)
-    # MeanDistance = 1000 / params_iso['parallax'][0]
-    # DistanceError = params_iso['parallax'][1] * MeanDistance
-    # LowDistance = MeanDistance - 3 * DistanceError
-    # HighDistance = MeanDistance + 3 * DistanceError
-    # model1._bounds['distance'] = (LowDistance, HighDistance)
-    # model1._bounds['age'] = (np.log10(1.0e9), np.log10(13.721e9))
+    MeanDistance = 1000 / params_iso['parallax'][0]
+    HighDistance = 1000 / (params_iso['parallax'][0]-3*params_iso['parallax'][1])
+    LowDistance = 1000 / (params_iso['parallax'][0]+3*params_iso['parallax'][1])
+    model1._bound["distance"] = (LowDistance, HighDistance)
+    model1._bounds['age'] = (np.log10(1.0e8), np.log10(13.721e9))
+
+    # M67
+    # LowerExtinction = np.max([0,extinctionV-3*0.10*extinctionV])
+    # UpperExtinction = extinctionV+3*0.10*extinctionV
+    # model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
+    # model1._bounds['AV'] = (LowerExtinction, UpperExtinction)
+    # model1._bounds['distance'] = (813,873)
+    # model1._bounds['age'] = (np.log10(1.0e9),np.log10(13.721e9))
 
     # Section 3: runs and saves the results.
     # create plots and posteriors folder
@@ -267,10 +271,10 @@ def run_isochrones(row,name,base):
 
     # save the posterior, physical plot, and observed plot
     model1.derived_samples.to_csv("./posteriors/{f}_posteriors/{id}_take2.csv".format(f=name,id=int(row['dr3_source_id'].iloc[0])), index_label='index')
-    plot1 = model1.corner_observed()
-    plt.savefig("./plots/{f}_plots/{id1}/corner_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
-    plot2 = model1.corner_physical()
-    plt.savefig("./plots/{f}_plots/{id1}/physical_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
+    # plot1 = model1.corner_observed()
+    # plt.savefig("./plots/{f}_plots/{id1}/corner_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
+    # plot2 = model1.corner_physical()
+    # plt.savefig("./plots/{f}_plots/{id1}/physical_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
 
     # close the plots to prevent memory leak
     plt.clf()
