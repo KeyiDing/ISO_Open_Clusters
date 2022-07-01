@@ -28,7 +28,7 @@ process named by the base_name, and records the loop index, dr3_source_id, and r
 3. In job_mp, set "ntasks-per-node" to the number of processes, and enter your email under "mail-user".
 
 ## Note on Python Multiprocessing
- - :warning: **Based on my experiment, in the multiprocessing method, the program won't terminate and no error code will be reported if one process files, and it is difficult to keep track of the error message for each process. Therefore the SLURM Job Array method is more encouraged to run the analysis in a large scale.** :warning:
+ - :warning: **Based on my experiment, sometimes Multinest stops sampling (without any error message), while the program does not stop. I'm still investigating the potential cause. ** :warning:
  - Since the code does not require communication between processes, distributed memory is used to run the code on Rockfish, with each process having 16 GB of memory. Based on our past experiments, Isochrones usually takes less than 13 GB of memory, but feel free to increase it if needed.
  - In the job submission file, the number of CPU cores per node is specified through "ntasks-per-node", therefore it's essential to make sure that the number of processes in the Multiprocessing pool is less or equal to "ntasks-per-node". Theoretically the maximum number of processes per node is 48, but based on my experiment, a multiprocessing pool with approximately 40 processes will lead to IO mutex lock conflicts. I'm still investigating the potential cause.
  - If one of the process has an issue, the entire pool of processes will be stopped. In this case, manually specify the starting and ending point of the running loop for each process, and resubmit the job.
