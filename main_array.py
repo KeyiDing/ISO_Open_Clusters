@@ -8,7 +8,7 @@ def main():
     #name of the open cluster
     name = "Praesepe"
     #input photometry data
-    data_input = pd.read_csv("iso_input/Praesepe_nonbinary.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
+    data_input = pd.read_csv("iso_input/Praesepe_sample.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
     #specify the number of processes to run Isochrones in parallel, change it based on your need
     nprocess=20
 
