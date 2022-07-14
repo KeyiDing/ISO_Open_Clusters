@@ -184,23 +184,23 @@ def run_isochrones(row,name,base):
         mags_iso['WISE_W2'] = (row['w2mpro'].iloc[0],row['w2sigmpro'].iloc[0])
 
     # always use Pan-Starrs if available
-    if row['gMeanPSFMag'].isna().iloc[0] == False and row['gMeanPSFMagErr'].isna().iloc[0] == False:
+    if row['gMeanPSFMag'].isna().iloc[0] == False and row['gMeanPSFMagErr'].isna().iloc[0] == False and row['gMeanPSFMagErr'].iloc[0]>14.5:
         count += 1
         bands.append("PS_g")
         mags_iso["PS_g"] = (row["gMeanPSFMag"].iloc[0],row["gMeanPSFMagErr"].iloc[0])
-    if row['rMeanPSFMag'].isna().iloc[0] == False and row['rMeanPSFMagErr'].isna().iloc[0] == False:
+    if row['rMeanPSFMag'].isna().iloc[0] == False and row['rMeanPSFMagErr'].isna().iloc[0] == False and row['rMeanPSFMagErr'].iloc[0]>15:
         count += 1
         bands.append("PS_r")
         mags_iso["PS_r"] = (row["rMeanPSFMag"].iloc[0],row["rMeanPSFMagErr"].iloc[0])
-    if row['iMeanPSFMag'].isna().iloc[0] == False and row['iMeanPSFMagErr'].isna().iloc[0] == False:
+    if row['iMeanPSFMag'].isna().iloc[0] == False and row['iMeanPSFMagErr'].isna().iloc[0] == False and row['iMeanPSFMagErr'].iloc[0]>15:
         count += 1
         bands.append("PS_i")
         mags_iso["PS_i"] = (row["iMeanPSFMag"].iloc[0],row["iMeanPSFMagErr"].iloc[0])
-    if row['zMeanPSFMag'].isna().iloc[0] == False and row['zMeanPSFMagErr'].isna().iloc[0] == False:
+    if row['zMeanPSFMag'].isna().iloc[0] == False and row['zMeanPSFMagErr'].isna().iloc[0] == False and row['zMeanPSFMagErr'].iloc[0]>14:
         count += 1
         bands.append("PS_z")
         mags_iso["PS_z"] = (row["zMeanPSFMag"].iloc[0],row["zMeanPSFMagErr"].iloc[0])
-    if row['yMeanPSFMag'].isna().iloc[0] == False and row['yMeanPSFMagErr'].isna().iloc[0] == False:
+    if row['yMeanPSFMag'].isna().iloc[0] == False and row['yMeanPSFMagErr'].isna().iloc[0] == False and row['yMeanPSFMagErr'].iloc[0]>13:
         count += 1
         bands.append("PS_y")
         mags_iso["PS_y"] = (row["yMeanPSFMag"].iloc[0],row["yMeanPSFMagErr"].iloc[0])
@@ -240,12 +240,13 @@ def run_isochrones(row,name,base):
     
     # Nearby clusters
     model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
-    model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
+    # model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
     MeanDistance = 1000 / params_iso['parallax'][0]
     HighDistance = 1000 / (params_iso['parallax'][0]-3*params_iso['parallax'][1])
     LowDistance = 1000 / (params_iso['parallax'][0]+3*params_iso['parallax'][1])
-    model1._bound["distance"] = (LowDistance, HighDistance)
-    model1._bounds['age'] = (np.log10(1.0e8), np.log10(13.721e9))
+    model1._bounds["distance"] = (LowDistance, HighDistance)
+    model1._bounds['age'] = (8, np.log10(13.721e9))
+    model1._bounds['feh'] = (-1,0.5)
 
     # M67
     # LowerExtinction = np.max([0,extinctionV-3*0.10*extinctionV])
@@ -257,12 +258,13 @@ def run_isochrones(row,name,base):
 
     # Section 3: runs and saves the results.
     # create plots and posteriors folder
-    if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
-        os.mkdir('./plots/{f}_plots'.format(f=name))
-    if os.path.isdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0]))) == False:
-        os.mkdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0])))
+    # if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
+    #     os.mkdir('./plots/{f}_plots'.format(f=name))
+    # if os.path.isdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0]))) == False:
+    #     os.mkdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0])))
     if os.path.isdir('./posteriors/{f}_posteriors'.format(f=name)) == False:
         os.mkdir('./posteriors/{f}_posteriors'.format(f=name))
+    
 
     # fit parameters to the model
     model1.fit(refit=True,n_live_points=1000,evidence_tolerance=0.5,max_iter=100000,basename=base)
