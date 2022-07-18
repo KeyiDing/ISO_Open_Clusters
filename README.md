@@ -1,5 +1,5 @@
 # ISO_Open_Clusters
-Repo for fitting stellar parameters of stars in open clusters using [Isochrones](https://github.com/timothydmorton/isochrones) analysis on [Advanced Research Computing at Hopkins](https://www.arch.jhu.edu/).
+Repo for fitting stellar parameters of stars in open clusters using [`Isochrones`](https://github.com/timothydmorton/isochrones) analysis on [Advanced Research Computing at Hopkins](https://www.arch.jhu.edu/).
 
 ## Files and Directories Structure:
  - iso_input: photometric data for open clusters (in CSV format)
