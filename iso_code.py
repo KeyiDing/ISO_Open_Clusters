@@ -46,7 +46,7 @@ def run_isochrones(row,name,base):
     c_icrs = SkyCoord(ra=r * u.degree, dec=d * u.degree, frame='icrs')
     # convert coordinates into galactic, and calculate extinction
     extinctionV = 0.7*(1-np.exp(-(1/plx)*np.sin(c_icrs.galactic.b)/0.125))*0.125/np.sin(c_icrs.galactic.b)
-    params_iso = {'parallax':(row["parallax"].iloc[0], row["parallax_error"].iloc[0])}
+    params_iso = {'parallax':(row["parallax"].iloc[0], row["parallax_error"].iloc[0]),'AV':(extinctionV,0.1*extinctionV)}
 
     # The second set of data are the actual stellar magnitudes (or brightness) in
     # each pass band. This is done in two ways. First you tell isochrones which
@@ -59,7 +59,7 @@ def run_isochrones(row,name,base):
     #always use Gaia_G
     bands = ['Gaia_G_DR2Rev']
     mags_iso = {'Gaia_G_DR2Rev':(row['gmag'].iloc[0],0.0003)}
-
+    
     # if GALEX FUV/NUV are available, then always include them
     if row['FUVmag'].isna().iloc[0]==False and row['e_FUVmag'].isna().iloc[0]==False:
         count += 1
@@ -240,12 +240,13 @@ def run_isochrones(row,name,base):
     
     # Nearby clusters
     model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
+    model1._bounds['AV'] = (0, 2*extinctionV)
     # model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
     MeanDistance = 1000 / params_iso['parallax'][0]
     HighDistance = 1000 / (params_iso['parallax'][0]-3*params_iso['parallax'][1])
     LowDistance = 1000 / (params_iso['parallax'][0]+3*params_iso['parallax'][1])
     model1._bounds["distance"] = (LowDistance, HighDistance)
-    model1._bounds['age'] = (8, np.log10(13.721e9))
+    model1._bounds['age'] = (7, np.log10(13.721e9))
     model1._bounds['feh'] = (-1,0.5)
 
     # M67
@@ -258,10 +259,10 @@ def run_isochrones(row,name,base):
 
     # Section 3: runs and saves the results.
     # create plots and posteriors folder
-    # if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
-    #     os.mkdir('./plots/{f}_plots'.format(f=name))
-    # if os.path.isdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0]))) == False:
-    #     os.mkdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0])))
+    if os.path.isdir('./plots/{f}_plots'.format(f=name)) == False:
+        os.mkdir('./plots/{f}_plots'.format(f=name))
+    if os.path.isdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0]))) == False:
+        os.mkdir("./plots/{n}_plots/{id}".format(n=name,id=int(row['dr3_source_id'].iloc[0])))
     if os.path.isdir('./posteriors/{f}_posteriors'.format(f=name)) == False:
         os.mkdir('./posteriors/{f}_posteriors'.format(f=name))
     
@@ -273,10 +274,10 @@ def run_isochrones(row,name,base):
 
     # save the posterior, physical plot, and observed plot
     model1.derived_samples.to_csv("./posteriors/{f}_posteriors/{id}_take2.csv".format(f=name,id=int(row['dr3_source_id'].iloc[0])), index_label='index')
-    # plot1 = model1.corner_observed()
-    # plt.savefig("./plots/{f}_plots/{id1}/corner_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
-    # plot2 = model1.corner_physical()
-    # plt.savefig("./plots/{f}_plots/{id1}/physical_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
+    plot1 = model1.corner_observed()
+    plt.savefig("./plots/{f}_plots/{id1}/corner_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
+    plot2 = model1.corner_physical()
+    plt.savefig("./plots/{f}_plots/{id1}/physical_{id2}.png".format(f=name,id1=int(row['dr3_source_id'].iloc[0]),id2=int(row['dr3_source_id'].iloc[0])))
 
     # close the plots to prevent memory leak
     plt.clf()
