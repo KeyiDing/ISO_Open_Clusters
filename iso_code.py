@@ -39,14 +39,18 @@ def run_isochrones(row,name,base):
     #in our code, we use the mean parallax of the open cluster as the parallax of each star
     #change the value of extinctionV and parallax based on the open clusters
     
-    # get Celestial Coordinates
-    r=row["ra2000"].iloc[0]
-    d=row["dec2000"].iloc[0]
-    plx=row["parallax"].iloc[0]
-    c_icrs = SkyCoord(ra=r * u.degree, dec=d * u.degree, frame='icrs')
-    # convert coordinates into galactic, and calculate extinction
-    extinctionV = 0.7*(1-np.exp(-(1/plx)*np.sin(c_icrs.galactic.b)/0.125))*0.125/np.sin(c_icrs.galactic.b)
-    params_iso = {'parallax':(row["parallax"].iloc[0], row["parallax_error"].iloc[0]),'AV':(extinctionV,0.1*extinctionV)}
+    # Nearby Clusters
+    # # get Celestial Coordinates
+    # r=row["ra2000"].iloc[0]
+    # d=row["dec2000"].iloc[0]
+    # plx=row["parallax"].iloc[0]
+    # c_icrs = SkyCoord(ra=r * u.degree, dec=d * u.degree, frame='icrs')
+    # # convert coordinates into galactic, and calculate extinction
+    # extinctionV = 0.7*(1-np.exp(-(1/plx)*np.sin(c_icrs.galactic.b)/0.125))*0.125/np.sin(c_icrs.galactic.b)
+    # params_iso = {'parallax':(row["parallax"].iloc[0], row["parallax_error"].iloc[0])}
+    
+    # NGC0188
+    params_iso = {'parallax':(0.5593,0.0011),'AV':(0.33,0.033)}
 
     # The second set of data are the actual stellar magnitudes (or brightness) in
     # each pass band. This is done in two ways. First you tell isochrones which
@@ -60,16 +64,16 @@ def run_isochrones(row,name,base):
     bands = ['Gaia_G_DR2Rev']
     mags_iso = {'Gaia_G_DR2Rev':(row['gmag'].iloc[0],0.0003)}
     
-    # if GALEX FUV/NUV are available, then always include them
     if row['FUVmag'].isna().iloc[0]==False and row['e_FUVmag'].isna().iloc[0]==False:
         count += 1
         bands.append('GALEX_FUV')
         mags_iso['GALEX_FUV'] = (row['FUVmag'].iloc[0],row['e_FUVmag'].iloc[0])
-
+        
     if row['NUVmag'].isna().iloc[0]==False and row['e_NUVmag'].isna().iloc[0]==False:
         count += 1
         bands.append('GALEX_NUV')
         mags_iso['GALEX_NUV'] = (row['NUVmag'].iloc[0],row['e_NUVmag'].iloc[0])
+    
         
     # a flag variable that checks if SkyMapper U band exists
     #if only SkyMapper u-band data available, then use SkyMapper
@@ -182,28 +186,30 @@ def run_isochrones(row,name,base):
         count += 1
         bands.append('WISE_W2')
         mags_iso['WISE_W2'] = (row['w2mpro'].iloc[0],row['w2sigmpro'].iloc[0])
+        
 
     # always use Pan-Starrs if available
-    if row['gMeanPSFMag'].isna().iloc[0] == False and row['gMeanPSFMagErr'].isna().iloc[0] == False and row['gMeanPSFMagErr'].iloc[0]>14.5:
+    if row['gMeanPSFMag'].isna().iloc[0] == False and row['gMeanPSFMagErr'].isna().iloc[0] == False and row['gMeanPSFMag'].iloc[0]>14.5:
         count += 1
         bands.append("PS_g")
         mags_iso["PS_g"] = (row["gMeanPSFMag"].iloc[0],row["gMeanPSFMagErr"].iloc[0])
-    if row['rMeanPSFMag'].isna().iloc[0] == False and row['rMeanPSFMagErr'].isna().iloc[0] == False and row['rMeanPSFMagErr'].iloc[0]>15:
+    if row['rMeanPSFMag'].isna().iloc[0] == False and row['rMeanPSFMagErr'].isna().iloc[0] == False and row['rMeanPSFMag'].iloc[0]>15:
         count += 1
         bands.append("PS_r")
         mags_iso["PS_r"] = (row["rMeanPSFMag"].iloc[0],row["rMeanPSFMagErr"].iloc[0])
-    if row['iMeanPSFMag'].isna().iloc[0] == False and row['iMeanPSFMagErr'].isna().iloc[0] == False and row['iMeanPSFMagErr'].iloc[0]>15:
+    if row['iMeanPSFMag'].isna().iloc[0] == False and row['iMeanPSFMagErr'].isna().iloc[0] == False and row['iMeanPSFMag'].iloc[0]>15:
         count += 1
         bands.append("PS_i")
         mags_iso["PS_i"] = (row["iMeanPSFMag"].iloc[0],row["iMeanPSFMagErr"].iloc[0])
-    if row['zMeanPSFMag'].isna().iloc[0] == False and row['zMeanPSFMagErr'].isna().iloc[0] == False and row['zMeanPSFMagErr'].iloc[0]>14:
+    if row['zMeanPSFMag'].isna().iloc[0] == False and row['zMeanPSFMagErr'].isna().iloc[0] == False and row['zMeanPSFMag'].iloc[0]>14:
         count += 1
         bands.append("PS_z")
         mags_iso["PS_z"] = (row["zMeanPSFMag"].iloc[0],row["zMeanPSFMagErr"].iloc[0])
-    if row['yMeanPSFMag'].isna().iloc[0] == False and row['yMeanPSFMagErr'].isna().iloc[0] == False and row['yMeanPSFMagErr'].iloc[0]>13:
+    if row['yMeanPSFMag'].isna().iloc[0] == False and row['yMeanPSFMagErr'].isna().iloc[0] == False and row['yMeanPSFMag'].iloc[0]>13:
         count += 1
         bands.append("PS_y")
         mags_iso["PS_y"] = (row["yMeanPSFMag"].iloc[0],row["yMeanPSFMagErr"].iloc[0])
+        
 
     # if nothing other than Gaia DR2 G-band data are available by this step,
     # then add Gaia DR2 G_BP and G_RP data with appropriate uncertainties
@@ -239,15 +245,15 @@ def run_isochrones(row,name,base):
     # specify Prior distribution and bound to do Bayesian Statistics
     
     # Nearby clusters
-    model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
-    model1._bounds['AV'] = (0, 2*extinctionV)
-    # model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
-    MeanDistance = 1000 / params_iso['parallax'][0]
-    HighDistance = 1000 / (params_iso['parallax'][0]-3*params_iso['parallax'][1])
-    LowDistance = 1000 / (params_iso['parallax'][0]+3*params_iso['parallax'][1])
-    model1._bounds["distance"] = (LowDistance, HighDistance)
-    model1._bounds['age'] = (7, np.log10(13.721e9))
-    model1._bounds['feh'] = (-1,0.5)
+    # model1.set_prior(AV=FlatPrior((0, 2*extinctionV)))
+    # model1._bounds['AV'] = (0, 2*extinctionV)
+    # # model1.set_prior(AV=GaussianPrior(mean=extinctionV, sigma=0.1 * extinctionV))
+    # MeanDistance = 1000 / params_iso['parallax'][0]
+    # HighDistance = 1000 / (params_iso['parallax'][0]-3*params_iso['parallax'][1])
+    # LowDistance = 1000 / (params_iso['parallax'][0]+3*params_iso['parallax'][1])
+    # model1._bounds["distance"] = (LowDistance, HighDistance)
+    # model1._bounds['age'] = (8, np.log10(13.721e9))
+    # model1._bounds['feh'] = (-1,0.5)
 
     # M67
     # LowerExtinction = np.max([0,extinctionV-3*0.10*extinctionV])
@@ -256,6 +262,19 @@ def run_isochrones(row,name,base):
     # model1._bounds['AV'] = (LowerExtinction, UpperExtinction)
     # model1._bounds['distance'] = (813,873)
     # model1._bounds['age'] = (np.log10(1.0e9),np.log10(13.721e9))
+    
+    # NGC0188
+    extinctionV = 0.33
+    LowerExtinction = np.max([0,extinctionV-3*0.10*extinctionV])
+    UpperExtinction = extinctionV+3*0.10*extinctionV
+    model1.set_prior(AV=FlatPrior((LowerExtinction, UpperExtinction)))
+    model1._bounds['AV'] = (LowerExtinction, UpperExtinction)
+    MeanDistance = 1000 / params_iso['parallax'][0]
+    HighDistance = 1000 / (params_iso['parallax'][0]-3*params_iso['parallax'][1])
+    LowDistance = 1000 / (params_iso['parallax'][0]+3*params_iso['parallax'][1])
+    model1._bounds["distance"] = (LowDistance, HighDistance)
+    model1._bounds['age'] = (np.log10(1.0e9),np.log10(13.721e9))
+    model1._bounds['feh'] = (-1,0.5)
 
     # Section 3: runs and saves the results.
     # create plots and posteriors folder
@@ -282,3 +301,13 @@ def run_isochrones(row,name,base):
     # close the plots to prevent memory leak
     plt.clf()
     plt.close('all')
+
+
+
+# 1. update extinctionV based on https://stilism.obspm.fr/ for alphaPer (likelihood and prior), and NearBy clusters
+#  - update AV upper bound for not converging stars
+# 2. For M67, replace SDSS with PAN-STARRS to check for the effect on UV band
+# 3. for Blanco1, compare photometry use for the "structure"
+# 4. develop a automatic way to identify binaries and variable stars based on Simbad
+# 5. Prepare for report and paper: Latex for AAS, compare with spectrum (Galah, Lamost) and compare (dispersion...)
+# LAMOST: http://www.lamost.org/dr7/v2.0/catalogue
