@@ -6,13 +6,13 @@ import time
 
 def main():
     #name of the open cluster
-    name = "Hyades_binary_rejected"
+    name = "M67_pht_fluxmag"
     #input photometry data
-    data_input = pd.read_csv("iso_input/binary_rejected/Hyades_binary_rejected.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
+    data_input = pd.read_csv("iso_input/M67_pht_fluxmag.csv", dtype={'dr2_source_id': int, 'dr3_source_id': int})
 
     base = "chain0"
 
-    for i in range(200,len(data_input)):
+    for i in range(0,len(data_input)):
         iso_code.run_isochrones(data_input.iloc[[i]],name,base)
         with open("./records/record.txt","w") as out:
             out.write(str(i))
